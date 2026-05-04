@@ -12,8 +12,10 @@ const TaskRow = ({ task, onEdit }) => {
   const over = isOverdue(task.dueDate, task.status);
 
   return (
-    <div onClick={() => onEdit(task)}
-      className="flex items-center gap-4 px-4 py-3.5 hover:bg-surface-50 dark:hover:bg-surface-700/30 transition-colors cursor-pointer group">
+    <div
+      onClick={() => onEdit(task)}
+      className="flex items-center gap-4 px-4 py-3.5 hover:bg-surface-50 dark:hover:bg-surface-700/30 transition-colors cursor-pointer group"
+    >
       <span className={`w-2 h-2 rounded-full ${sc.dot} shrink-0`} />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-surface-900 dark:text-white truncate group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
@@ -48,76 +50,137 @@ const TasksPage = () => {
   const { data, loading, refetch } = useFetch(`/tasks?${params.toString()}`);
   const tasks = data?.tasks || [];
 
-  const setFilter = (k, v) => setFilters((f) => ({ ...f, [k]: f[k] === v ? '' : v }));
+  const setFilter = (k, v) =>
+    setFilters((f) => ({ ...f, [k]: f[k] === v ? '' : v }));
 
+  // 🔥 UPDATED PROFESSIONAL BUTTON
   const FilterBtn = ({ label, field, value, active }) => (
-    <button onClick={() => setFilter(field, value)}
-      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-        active ? 'bg-brand-600 text-white' : 'bg-surface-100 dark:bg-surface-700 text-surface-600 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600'
-      }`}>
+    <button
+      onClick={() => setFilter(field, value)}
+      className={`
+        px-4 py-2 rounded-xl text-sm font-semibold
+        transition-all duration-200
+        border flex items-center justify-center
+        ${
+          active
+            ? 'text-white shadow-md scale-[1.02]'
+            : 'text-surface-600 dark:text-surface-300 hover:scale-[1.02]'
+        }
+      `}
+      style={{
+        background: active
+          ? 'var(--color-brand)'
+          : 'var(--color-surface)',
+        borderColor: active
+          ? 'var(--color-brand)'
+          : 'var(--color-border)'
+      }}
+    >
       {label}
     </button>
   );
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-display font-bold text-surface-900 dark:text-white">My Tasks</h1>
-        <p className="text-sm text-surface-500 dark:text-surface-400 mt-0.5">{data?.pagination?.total ?? 0} tasks across all projects</p>
+        <h1 className="text-2xl font-display font-bold text-surface-900 dark:text-white">
+          My Tasks
+        </h1>
+        <p className="text-sm text-surface-500 dark:text-surface-400 mt-0.5">
+          {data?.pagination?.total ?? 0} tasks across all projects
+        </p>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center">
+      {/* 🔥 FILTERS */}
+      <div className="flex flex-wrap gap-4 items-center">
+
+        {/* Search */}
         <div className="relative">
-          {/* <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg> */}
-          <input className="input pl-10 w-56" placeholder="Search tasks..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <input
+            className="input pl-10 w-56"
+            placeholder="Search tasks..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
 
-        <div className="flex gap-1.5">
-          <span className="text-xs font-semibold text-surface-400 self-center mr-1">Status:</span>
+        {/* Status */}
+        <div className="flex items-center gap-2 bg-surface-100 dark:bg-surface-800 p-2 rounded-xl">
+          <span className="text-xs font-semibold text-surface-400 mr-1">
+            Status:
+          </span>
           <FilterBtn label="To Do" field="status" value="todo" active={filters.status === 'todo'} />
           <FilterBtn label="In Progress" field="status" value="in_progress" active={filters.status === 'in_progress'} />
           <FilterBtn label="Done" field="status" value="done" active={filters.status === 'done'} />
         </div>
 
-        <div className="flex gap-1.5">
-          <span className="text-xs font-semibold text-surface-400 self-center mr-1">Mine:</span>
+        {/* Assigned */}
+        <div className="flex items-center gap-2 bg-surface-100 dark:bg-surface-800 p-2 rounded-xl">
+          <span className="text-xs font-semibold text-surface-400 mr-1">
+            Mine:
+          </span>
           <FilterBtn label="Assigned to me" field="assignedTo" value="me" active={filters.assignedTo === 'me'} />
         </div>
 
+        {/* Clear */}
         {(filters.status || filters.assignedTo || filters.priority || search) && (
-          <button onClick={() => { setFilters({ status: '', priority: '', assignedTo: '' }); setSearch(''); }}
-            className="text-xs text-surface-400 hover:text-surface-600 transition-colors">
+          <button
+            onClick={() => {
+              setFilters({ status: '', priority: '', assignedTo: '' });
+              setSearch('');
+            }}
+            className="text-sm px-3 py-2 rounded-lg border transition-all hover:bg-surface-100 dark:hover:bg-surface-800"
+            style={{
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-muted)'
+            }}
+          >
             Clear filters
           </button>
         )}
       </div>
 
-      {/* Task list */}
+      {/* TASK LIST */}
       {loading ? (
-        <div className="flex justify-center py-16"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-16">
+          <Spinner size="lg" />
+        </div>
       ) : tasks.length === 0 ? (
-        <EmptyState icon="✅" title="No tasks found" description="No tasks match your current filters." />
+        <EmptyState
+          icon="✅"
+          title="No tasks found"
+          description="No tasks match your current filters."
+        />
       ) : (
         <div className="card divide-y divide-surface-100 dark:divide-surface-700">
           {/* Header */}
           <div className="flex items-center gap-4 px-4 py-2.5 bg-surface-50 dark:bg-surface-800/50 rounded-t-2xl">
             <div className="w-2" />
-            <p className="flex-1 text-xs font-semibold text-surface-500 uppercase tracking-wider">Task</p>
-            <p className="text-xs font-semibold text-surface-500 uppercase tracking-wider w-20 hidden sm:block">Status</p>
-            <p className="text-xs font-semibold text-surface-500 uppercase tracking-wider w-20 hidden md:block">Priority</p>
-            <p className="text-xs font-semibold text-surface-500 uppercase tracking-wider w-24 hidden lg:block">Due Date</p>
-            <p className="text-xs font-semibold text-surface-500 uppercase tracking-wider">User</p>
+            <p className="flex-1 text-xs font-semibold text-surface-500 uppercase">Task</p>
+            <p className="text-xs font-semibold text-surface-500 w-20 hidden sm:block">Status</p>
+            <p className="text-xs font-semibold text-surface-500 w-20 hidden md:block">Priority</p>
+            <p className="text-xs font-semibold text-surface-500 w-24 hidden lg:block">Due Date</p>
+            <p className="text-xs font-semibold text-surface-500">User</p>
           </div>
-          {tasks.map((task) => <TaskRow key={task.id} task={task} onEdit={setEditTask} />)}
+
+          {tasks.map((task) => (
+            <TaskRow key={task.id} task={task} onEdit={setEditTask} />
+          ))}
         </div>
       )}
 
       {editTask && (
-        <EditTaskModal open={!!editTask} task={editTask} onClose={() => setEditTask(null)}
-          isAdmin={false} onUpdated={() => { setEditTask(null); refetch(); }} />
+        <EditTaskModal
+          open={!!editTask}
+          task={editTask}
+          onClose={() => setEditTask(null)}
+          isAdmin={false}
+          onUpdated={() => {
+            setEditTask(null);
+            refetch();
+          }}
+        />
       )}
     </div>
   );
