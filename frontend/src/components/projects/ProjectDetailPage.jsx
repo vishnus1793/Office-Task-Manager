@@ -163,12 +163,12 @@ const ProjectDetailPage = () => {
                   {m.role}
                 </span>
                 {isAdmin && (
-                  <button onClick={() => removeMember(m.userId)}
-                    className="p-1.5 text-surface-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                  <button
+  onClick={() => removeMember(m.userId)}
+  className="px-3 py-1 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+>
+  Remove Member
+</button>
                 )}
               </div>
             ))
